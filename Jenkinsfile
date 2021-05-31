@@ -144,7 +144,7 @@ pipeline { //파이프라인의 시작
           steps {
             echo 'Build Backend'
 
-            dir ('./server'){ =
+            dir ('./server'){ 
                 sh """
                 docker build . -t server --build-arg env=${PROD}
                 """
