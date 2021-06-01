@@ -64,6 +64,7 @@ pipeline { //파이프라인의 시작
             // 프론트엔드 디렉토리의 정적파일들을 S3 에 올림, 이 전에 반드시 EC2 instance profile 을 등록해야함.
             dir ('./website'){ //dir : change current directory (jenkins가 원래 루트디렉토리에 있다가 ./website로 이동)
                 sh '''
+                pwd
                 aws s3 sync ./ s3://iamjenkinsbucket1
                 '''
                 //aws : aws CLI 시작, sync : 여러개의 파일을 recursive하게 복사, s3://[버킷이름]/[파일이름]
