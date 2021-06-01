@@ -97,14 +97,7 @@ pipeline { //파이프라인의 시작
           }
         }
 
-            )
 
-          }
-
-          
-        }
-        
-        
         stage('Test Backend') {
           //test를 하려면 npm 있어야하고 npm은 node서버 바탕에서 수행. 즉, 도커로 node 띄우기.
           agent any
