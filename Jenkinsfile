@@ -21,7 +21,7 @@ pipeline { //파이프라인의 시작
     stages {
         //stage : 여러 work들을 수행
         //필요한 Git 레포지토리를 다운로드 받음
-        stage('Prepare') {
+        stage('Building') {
             agent any
             // 해당 Git 레포지토리를 Pull 받음
             steps {
@@ -95,61 +95,6 @@ pipeline { //파이프라인의 시작
               '''
             }
           }
-        }
-
-
-        stage('Test Backend') {
-          //test를 하려면 npm 있어야하고 npm은 node서버 바탕에서 수행. 즉, 도커로 node 띄우기.
-          agent any
-           //   image 'node:latest'
-            
-          
-          steps {
-            echo 'Test Backend'
-
-
-                // npm run test : index.test.js 실행
-            }
-        }
-        
-        
-        stage('Bulid Backend') {
-          agent any
-          steps {
-            echo 'Build Backend'
-          }
-
-          post { //원래 앞의 stage들은 실패해도 다음 stage로 넘어감. 서버를 빌드하다 실패했는데 배포하면 안될 것임. 빌드하다 실패하면 에러 실행하고 pipeline강제종료
-            failure {
-              error 'This pipeline stops here...'
-            }
-          }
-        }
-        
-        stage('Deploy Backend') {
-          agent any
-
-          steps {
-            echo 'Build Backend'
-
-//            dir ('./server'){
-//                sh '''
-//                docker run -p 80:80 -d server 
-//                '''
-              //위에서 만든 도커 이미지 run
-//            }
-          }
-
-          post {
-            success {
-              echo 'FINALLY SUCCESS'
-              
-//              mail  to: 'wlwhswnsrl96@gmail.com',
-//                    subject: "Deploy Success",
-//                    body: "Successfully deployed!"
-                  
-            }
-          }
-        }
+        }      
   }
 }
