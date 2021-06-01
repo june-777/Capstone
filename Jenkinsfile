@@ -32,6 +32,7 @@ pipeline { //파이프라인의 시작
                     credentialsId: 'june777_Capstone'
                     sh '''
                     sleep 5
+                    pwd
                     '''
             }
             //post : "stage"의 실행이 완료될 때 실행되는 하나 이상의 추가 단계, 공식문서에선 stage{ } 이후에 사용되지만, block 안에서도 사용 가능한듯.
