@@ -58,9 +58,9 @@ pipeline { //파이프라인의 시작
 
         //(중요!!) ./website의 파일들을 aws s3 에 파일을 올림 
         //위에서 accesstoken을 환경변수로 등록함으로써, 해당 AWS user에 대한 내용들이 나오는 것임.
-        stage('Deploy Frontend') {
+        stage('Deploy to AWS: S3') {
           steps {
-            echo 'Deploying Frontend'
+            echo 'Deploying to AWS: S3'
             // 프론트엔드 디렉토리의 정적파일들을 S3 에 올림, 이 전에 반드시 EC2 instance profile 을 등록해야함.
             dir ('./website'){ //dir : change current directory (jenkins가 원래 루트디렉토리에 있다가 ./website로 이동)
                 sh '''
@@ -77,25 +77,29 @@ pipeline { //파이프라인의 시작
               // failed, record the test results and archive the jar file.
               success { //성공시 수행
                   echo 'Successfully Cloned Repository'
-
-                  // 메일전송 (해당 메일에 대한 credential등록을 해야함)
-//                  mail  to: 'wlwhswnsrl96@gmail.com',
-//                        subject: "Deploy Frontend Success",
-//                        body: "Successfully deployed frontend!"
-
               }
-
               failure {
                   echo 'I failed :('
-
-//                  mail  to: 'wlwhswnsrl@gmail.com',
-//                        subject: "Failed Pipelinee",
-//                        body: "Something is wrong with deploy frontend"
-              
               }
           }
-        
-        
+        }
+
+        stage('Deploy to nginx server') {
+          steps{
+            echo 'Deploying to nginx server'
+            dir ('./website'){
+              sh'''
+              pwd
+              cd /
+              pwd
+              '''
+            }
+
+            )
+
+          }
+
+          
         }
         
         
