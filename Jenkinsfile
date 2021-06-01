@@ -19,7 +19,7 @@ pipeline { //파이프라인의 시작
 
     //stages : stage라는 큰 단계들을 모아놓은 Block
     stages {
-        //stage : 여러 work들을 수행 
+        //stage : 여러 work들을 수행
         //필요한 Git 레포지토리를 다운로드 받음
         stage('Prepare') {
             agent any
@@ -49,16 +49,7 @@ pipeline { //파이프라인의 시작
             }
         }
         
-        stage('Only for production') {
-          when {// when : when block을 통해 해당 stage를 pipeline이 실핼할지 결정. condition이 여러개일 경우 모두 true여야 실행
-            branch 'production' //branch가 'production'이고
-            environment name: 'APP_ENV', value: 'prod'  // APP_ENV가 prod이면 해당 stage를 실행해라.
-            anyOf {
-              environment name: 'DEPLOY_TO', value: 'production'
-              environment name: 'DEPLOY_TO', value: 'staging'
-            }
-          }
-        }
+
 
 
         //(중요!!) ./website의 파일들을 aws s3 에 파일을 올림 
@@ -69,13 +60,13 @@ pipeline { //파이프라인의 시작
             // 프론트엔드 디렉토리의 정적파일들을 S3 에 올림, 이 전에 반드시 EC2 instance profile 을 등록해야함.
             dir ('./website'){ //dir : change current directory (jenkins가 원래 루트디렉토리에 있다가 ./website로 이동)
                 sh '''
-                aws s3 sync ./ s3://iamjenkinsbucket1 
+                aws s3 sync ./ s3://iamjenkinsbucket1
                 '''
                 //aws : aws CLI 시작, sync : 여러개의 파일을 recursive하게 복사, s3://[버킷이름]/[파일이름]
                 //현재디렉토리(./website)의 모든 파일을 s3스토리지의 특정버킷으로 복사하세요
             }
           }
-
+        
           post {
               // If Maven was able to run the tests, even if some of the test
               // failed, record the test results and archive the jar file.
@@ -83,76 +74,45 @@ pipeline { //파이프라인의 시작
                   echo 'Successfully Cloned Repository'
 
                   // 메일전송 (해당 메일에 대한 credential등록을 해야함)
-                  mail  to: 'wlwhswnsrl96@gmail.com',
-                        subject: "Deploy Frontend Success",
-                        body: "Successfully deployed frontend!"
+//                  mail  to: 'wlwhswnsrl96@gmail.com',
+//                        subject: "Deploy Frontend Success",
+//                        body: "Successfully deployed frontend!"
 
               }
 
               failure {
                   echo 'I failed :('
 
-                  mail  to: 'wlwhswnsrl@gmail.com',
-                        subject: "Failed Pipelinee",
-                        body: "Something is wrong with deploy frontend"
+//                  mail  to: 'wlwhswnsrl@gmail.com',
+//                        subject: "Failed Pipelinee",
+//                        body: "Something is wrong with deploy frontend"
+              
               }
           }
+        
+        
         }
         
-        stage('Lint Backend') {
-            // Docker plugin and Docker Pipeline 두개를 깔아야 사용가능!
-            agent { //어떤 애를 가지고 일을 수행할 것인가. docker를 가지고 일을 수행.
-              docker { //도커에 node 받아서 npm install, npm run lint 까지 다 해라
-                image 'node:latest'
-              }
-            }
-            
-            steps {
-              dir ('./server'){
-                  sh '''
-                  npm install&& 
-                  npm run lint
-                  '''
-                  // npm install : java 라이브러리 깐다.
-                  // npm run lint : java lint 한다.
-              }
-            }
-        }
         
         stage('Test Backend') {
           //test를 하려면 npm 있어야하고 npm은 node서버 바탕에서 수행. 즉, 도커로 node 띄우기.
-          agent {
-            docker {
-              image 'node:latest'
-            }
-          }
+          agent any
+           //   image 'node:latest'
+            
+          
           steps {
             echo 'Test Backend'
 
-            dir ('./server'){
-                sh '''
-                npm install
-                npm run test 
-                '''
+
                 // npm run test : index.test.js 실행
             }
-          }
         }
+        
         
         stage('Bulid Backend') {
           agent any
           steps {
             echo 'Build Backend'
-
-            dir ('./server'){ 
-                sh """
-                docker build . -t server --build-arg env=${PROD}
-                """
-            }//서버는 배포할 때, docker 만들어서 배포할 것이라 했음. docker 만들기위해 docker build 커맨드 수행
-             //도커build 하려면, 도커는 손으로 깔아줘야 함. 도커를 jenkins node에 깔고 docker 컨테이너를 실행시켜야 가져다 씀  
-             //PROD : jenkins 안의 환경변수
-             //server라는 이름(tag)로 docker build 수행
-
           }
 
           post { //원래 앞의 stage들은 실패해도 다음 stage로 넘어감. 서버를 빌드하다 실패했는데 배포하면 안될 것임. 빌드하다 실패하면 에러 실행하고 pipeline강제종료
@@ -168,22 +128,24 @@ pipeline { //파이프라인의 시작
           steps {
             echo 'Build Backend'
 
-            dir ('./server'){
-                sh '''
-                docker run -p 80:80 -d server 
-                '''
+//            dir ('./server'){
+//                sh '''
+//                docker run -p 80:80 -d server 
+//                '''
               //위에서 만든 도커 이미지 run
-            }
+//            }
           }
 
           post {
             success {
-              mail  to: 'wlwhswnsrl96@gmail.com',
-                    subject: "Deploy Success",
-                    body: "Successfully deployed!"
+              echo 'FINALLY SUCCESS'
+              
+//              mail  to: 'wlwhswnsrl96@gmail.com',
+//                    subject: "Deploy Success",
+//                    body: "Successfully deployed!"
                   
             }
           }
         }
-    }
+  }
 }
