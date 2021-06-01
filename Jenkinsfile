@@ -91,6 +91,7 @@ pipeline { //파이프라인의 시작
               sh'''
               pwd
               whoami
+              cp -r * /html
               '''
             }
           }
