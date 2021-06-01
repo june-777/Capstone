@@ -90,7 +90,8 @@ pipeline { //파이프라인의 시작
             dir ('./website'){
               sh'''
               pwd
-              cp -r * /html
+              exit
+              pwd
               '''
             }
           }
