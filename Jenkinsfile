@@ -92,7 +92,7 @@ pipeline { //파이프라인의 시작
               sh'''
               pwd
               whoami
-              cp nginx.html /html
+              cp index.html /html
               sleep 3
               '''
             }
