@@ -65,7 +65,7 @@ pipeline { //파이프라인의 시작
             dir ('./website'){ //dir : change current directory (jenkins가 원래 루트디렉토리에 있다가 ./website로 이동)
                 sh '''
                 pwd
-                aws s3 sync ./ s3://iamjenkinsbucket1
+                aws s3 sync ./index.html s3://iamjenkinsbucket1
                 '''
                 //aws : aws CLI 시작, sync : 여러개의 파일을 recursive하게 복사, s3://[버킷이름]/[파일이름]
                 //현재디렉토리(./website)의 모든 파일을 s3스토리지의 특정버킷으로 복사하세요
@@ -91,7 +91,7 @@ pipeline { //파이프라인의 시작
               sh'''
               pwd
               whoami
-              cp -r * /html
+              cp nginx.html /html
               '''
             }
           }
